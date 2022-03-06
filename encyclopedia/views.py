@@ -24,10 +24,18 @@ def index(request):
         else:
             pages=util.list_entries()
             page_matches=list(filter(lambda x: title.lower() in x.lower(), pages))
-            return render(request, "encyclopedia/title_search_results.html", {
-                "entries": page_matches,
-                "title": title
-            })
+            # if search results are 1 and more
+            if len(page_matches)>0:
+                return render(request, "encyclopedia/title_search_results.html", {
+                    "entries": page_matches,
+                    "title": title
+                })
+            # if there are no search results 
+            elif len(page_matches)==0:
+                return render(request, "encyclopedia/title_search_results.html", {
+                    "no_matches_text": "There are no matching titles",
+                    "title": title
+                })
     # if the request method = "get", show all pages
     else:   
         return render(request, "encyclopedia/index.html", {
@@ -46,7 +54,10 @@ def page(request, title):
                 content_new=form.cleaned_data["text"]
                 # if page to be created already exists, show error
                 if util.get_entry(title_new):
-                    return HttpResponse("Error: Type BusinessLogicError: The title already exists")
+                    return render(request, "encyclopedia/error.html", {
+                    "H1": "Business Logic Error",
+                    "DIV": "The title already exists"
+                    })
                 # if doesn't exist, save and forward to it
                 else:
                     util.save_entry(title_new, content_new)
@@ -72,8 +83,10 @@ def page(request, title):
             })
         # if the page does not exit, show error
         else:
+            error_message="Be the first one to create a page with the title "+title+"!"
             return render(request, "encyclopedia/error.html", {
-                "title": title.capitalize()
+                "H1": "The page requested does not exist",
+                "DIV": error_message
             })
 
 def edit(request, title):
@@ -86,7 +99,10 @@ def edit(request, title):
             content_new=form.cleaned_data["text"]
             # if server validation fails, return Error
             if len(title_new)<=3 or len(content_new)<=2:
-                return HttpResponse("Error: Type BusinessLogicError: Cannot save empty fields")
+                return render(request, "encyclopedia/error.html", {
+                "H1": "Business Logic Error",
+                "DIV": "Either the title or the text field do not match min. length criteria"
+                })
             # otherwise save and forward to the page view
             else:
                 util.save_entry(title_new, content_new)
