@@ -6,7 +6,7 @@
 
 {% block body %}
     <h1>All Pages containing "{{title}}"</h1>
-
+    {{no_matches_text}}
     <ul>
         {% for entry in entries %}
             <li><a href="/wiki/{{ entry }}">{{ entry }}</a></li>
