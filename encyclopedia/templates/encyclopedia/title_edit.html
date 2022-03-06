@@ -1,0 +1,17 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    {{title}}
+{% endblock %}
+
+{% block body %}
+    <h1>Here you can edit a "{{title}}" page</h1>
+
+    <form action="/wiki/{{title}}/edit" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input value="Save Changes to Page" type="submit">
+    </form>
+    
+
+{% endblock %}
